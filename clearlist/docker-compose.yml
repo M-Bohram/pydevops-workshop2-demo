@@ -1,0 +1,33 @@
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: clearlist
+      POSTGRES_USER: clearlist
+      POSTGRES_PASSWORD: clearlist
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+  backend:
+    build: ./backend
+    image: docker.io/mbohram/backend:latest
+    environment:
+      DATABASE_URL: postgresql://clearlist:clearlist@db:5432/clearlist
+      UPLOAD_FOLDER: /app/uploads
+      LOG_LEVEL: INFO
+    volumes:
+      - backend-uploads:/app/uploads
+    depends_on:
+      - db
+
+  frontend:
+    build: ./frontend
+    image: docker.io/mbohram/frontend:latest
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+
+volumes:
+  db-data:
+  backend-uploads:
